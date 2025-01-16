@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: bibliotheque
+    ports:
+      - "3306:3306"
+
+  config-server:
+    image: config-server
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
+
+  microservice-livre:
+    image: microservice-livre
+    build:
+      context: ../microservice-livre
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    depends_on:
+      - mysql
+      - config-server
+
+  microservice-utilisateur:
+    image: microservice-utilisateur
+    build:
+      context: ../microservice-utilisateur
+      dockerfile: Dockerfile
+    ports:
+      - "8082:8082"
+    depends_on:
+      - mysql
+      - config-server
+
+  microservice-pret:
+    image: microservice-pret
+    build:
+      context: ../microservice-pret
+      dockerfile: Dockerfile
+    ports:
+      - "8083:8083"
+    depends_on:
+      - mysql
+      - config-server
+      - microservice-livre
